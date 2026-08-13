@@ -1,0 +1,663 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: loyalty@probestack.io
+    name: Growth Engineering Team
+  description: |
+    Manages loyalty point balances, tier progression, and reward redemptions.
+    This API is used as the source specification to automatically generate
+    an API Gateway proxy (Kong or Apigee) with routing, authentication,
+    rate limiting, and caching policies.
+  title: Loyalty Rewards Service
+  version: 1.0.0
+  x-proxy-config:
+    upstream-url: https://loyalty-service.probestack.io
+    service-name: loyalty-rewards-gateway
+    rate-limit: 250/minute
+    cors-enabled: true
+    retries: 2
+servers:
+- description: Production Gateway
+  url: https://gateway.probestack.io/loyalty/v1
+- description: Local Gateway
+  url: http://localhost:8000/loyalty/v1
+security:
+- ApiKeyAuth: []
+tags:
+- description: Loyalty account balance and tier
+  name: Accounts
+- description: Earn and burn point transactions
+  name: Transactions
+- description: Reward catalog and redemption
+  name: Rewards
+paths:
+  /accounts/{memberId}:
+    get:
+      description: "Retrieves the point balance, current tier, and progress towards\
+        \ the next tier for a member."
+      operationId: getLoyaltyAccount
+      parameters:
+      - description: Unique loyalty member identifier
+        explode: false
+        in: path
+        name: memberId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoyaltyAccount"
+          description: Loyalty account fetched successfully
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Missing or invalid API Key.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Resource not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Internal server error.
+      summary: Get loyalty account
+      tags:
+      - Accounts
+      x-proxy-route:
+        methods:
+        - GET
+        plugins:
+        - name: cors
+        - name: rate-limiting
+          config:
+            minute: 250
+        - name: proxy-cache
+          config:
+            cache_ttl: 30
+      x-accepts: application/json
+      x-tags:
+      - tag: Accounts
+    put:
+      description: Updates the member's communication and auto-redeem preferences.
+        Point balance cannot be set directly.
+      operationId: updateLoyaltyAccount
+      parameters:
+      - explode: false
+        in: path
+        name: memberId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAccountRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoyaltyAccount"
+          description: Account updated successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Invalid request payload or parameters.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Missing or invalid API Key.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Resource not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Internal server error.
+      summary: Update account preferences
+      tags:
+      - Accounts
+      x-proxy-route:
+        methods:
+        - PUT
+        plugins:
+        - name: cors
+        - name: rate-limiting
+          config:
+            minute: 100
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: Accounts
+  /accounts/{memberId}/transactions:
+    get:
+      description: "Returns the earn and burn history for a member, most recent first."
+      operationId: listPointTransactions
+      parameters:
+      - explode: false
+        in: path
+        name: memberId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: Filter by transaction type
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          default: ALL
+          enum:
+          - EARN
+          - BURN
+          - EXPIRY
+          - ADJUSTMENT
+          - ALL
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/PointTransaction"
+                type: array
+          description: Transactions fetched successfully
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Missing or invalid API Key.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Resource not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Internal server error.
+      summary: List point transactions
+      tags:
+      - Transactions
+      x-proxy-route:
+        methods:
+        - GET
+        plugins:
+        - name: cors
+        - name: rate-limiting
+          config:
+            minute: 250
+      x-accepts: application/json
+      x-tags:
+      - tag: Transactions
+    post:
+      description: Credits or debits points against the member's balance. Burns are
+        rejected if the balance is insufficient.
+      operationId: createPointTransaction
+      parameters:
+      - explode: false
+        in: path
+        name: memberId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTransactionRequest"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointTransaction"
+          description: Transaction recorded successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Invalid request payload or parameters.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Missing or invalid API Key.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Internal server error.
+      summary: Record a point transaction
+      tags:
+      - Transactions
+      x-proxy-route:
+        methods:
+        - POST
+        plugins:
+        - name: cors
+        - name: rate-limiting
+          config:
+            minute: 60
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: Transactions
+  /rewards:
+    get:
+      description: "Returns the reward catalog, optionally filtered to rewards the\
+        \ member can currently afford."
+      operationId: listRewards
+      parameters:
+      - description: Return only rewards this member has enough points for
+        explode: true
+        in: query
+        name: affordableForMemberId
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Reward"
+                type: array
+          description: Rewards fetched successfully
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Missing or invalid API Key.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Internal server error.
+      summary: List available rewards
+      tags:
+      - Rewards
+      x-proxy-route:
+        methods:
+        - GET
+        plugins:
+        - name: cors
+        - name: proxy-cache
+          config:
+            cache_ttl: 180
+      x-accepts: application/json
+      x-tags:
+      - tag: Rewards
+  /rewards/{rewardId}/redeem:
+    post:
+      description: Burns the required points and issues a redemption code. Redemption
+        is atomic.
+      operationId: redeemReward
+      parameters:
+      - explode: false
+        in: path
+        name: rewardId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RedeemRewardRequest"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Redemption"
+          description: Reward redeemed successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Invalid request payload or parameters.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Missing or invalid API Key.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Resource not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Internal server error.
+      summary: Redeem a reward
+      tags:
+      - Rewards
+      x-proxy-route:
+        methods:
+        - POST
+        plugins:
+        - name: cors
+        - name: rate-limiting
+          config:
+            minute: 40
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: Rewards
+components:
+  responses:
+    BadRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+      description: Invalid request payload or parameters.
+    Unauthorized:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+      description: Missing or invalid API Key.
+    NotFound:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+      description: Resource not found.
+    InternalError:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+      description: Internal server error.
+  schemas:
+    LoyaltyAccount:
+      example:
+        tier: GOLD
+        emailUpdates: true
+        pointsToNextTier: 2550
+        autoRedeem: false
+        lifetimePoints: 48200
+        pointBalance: 12450
+        memberId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        enrolledAt: 2000-01-23T04:56:07.000+00:00
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        memberId:
+          format: uuid
+          type: string
+        pointBalance:
+          example: 12450
+          type: integer
+        lifetimePoints:
+          example: 48200
+          type: integer
+        tier:
+          enum:
+          - BRONZE
+          - SILVER
+          - GOLD
+          - PLATINUM
+          example: GOLD
+          type: string
+        pointsToNextTier:
+          example: 2550
+          type: integer
+        autoRedeem:
+          example: false
+          type: boolean
+        emailUpdates:
+          example: true
+          type: boolean
+        enrolledAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+      - memberId
+      - pointBalance
+      - tier
+      type: object
+    UpdateAccountRequest:
+      example:
+        emailUpdates: false
+        autoRedeem: true
+      properties:
+        autoRedeem:
+          example: true
+          type: boolean
+        emailUpdates:
+          example: false
+          type: boolean
+      type: object
+    PointTransaction:
+      example:
+        occurredAt: 2000-01-23T04:56:07.000+00:00
+        balanceAfter: 12450
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        source: ORDER:ORD-2026-0001
+        type: EARN
+        memberId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        points: 350
+      properties:
+        id:
+          format: uuid
+          type: string
+        memberId:
+          format: uuid
+          type: string
+        type:
+          enum:
+          - EARN
+          - BURN
+          - EXPIRY
+          - ADJUSTMENT
+          example: EARN
+          type: string
+        points:
+          description: "Positive for earn, negative for burn or expiry"
+          example: 350
+          type: integer
+        source:
+          example: ORDER:ORD-2026-0001
+          type: string
+        balanceAfter:
+          example: 12450
+          type: integer
+        occurredAt:
+          format: date-time
+          type: string
+      type: object
+    CreateTransactionRequest:
+      example:
+        note: Points for August order
+        source: ORDER:ORD-2026-0001
+        type: EARN
+        points: 350
+      properties:
+        type:
+          enum:
+          - EARN
+          - BURN
+          - ADJUSTMENT
+          example: EARN
+          type: string
+        points:
+          example: 350
+          type: integer
+        source:
+          example: ORDER:ORD-2026-0001
+          type: string
+        note:
+          example: Points for August order
+          type: string
+      required:
+      - points
+      - type
+      type: object
+    Reward:
+      example:
+        pointCost: 1000
+        name: 10 USD store credit
+        available: true
+        description: Applies as a discount on your next order
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        category: CREDIT
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          example: 10 USD store credit
+          type: string
+        description:
+          example: Applies as a discount on your next order
+          type: string
+        pointCost:
+          example: 1000
+          type: integer
+        category:
+          enum:
+          - CREDIT
+          - MERCHANDISE
+          - EXPERIENCE
+          - DONATION
+          example: CREDIT
+          type: string
+        available:
+          example: true
+          type: boolean
+      type: object
+    RedeemRewardRequest:
+      example:
+        deliveryEmail: john.doe@example.com
+        memberId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        memberId:
+          format: uuid
+          type: string
+        deliveryEmail:
+          example: john.doe@example.com
+          format: email
+          type: string
+      required:
+      - memberId
+      type: object
+    Redemption:
+      example:
+        redemptionCode: RWD-8H3K-92QP
+        rewardId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        pointsBurned: 1000
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        expiresAt: 2000-01-23T04:56:07.000+00:00
+        memberId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        status: ISSUED
+      properties:
+        id:
+          format: uuid
+          type: string
+        rewardId:
+          format: uuid
+          type: string
+        memberId:
+          format: uuid
+          type: string
+        pointsBurned:
+          example: 1000
+          type: integer
+        redemptionCode:
+          example: RWD-8H3K-92QP
+          type: string
+        status:
+          enum:
+          - ISSUED
+          - USED
+          - EXPIRED
+          example: ISSUED
+          type: string
+        expiresAt:
+          format: date-time
+          type: string
+      type: object
+    ErrorResponse:
+      properties:
+        status:
+          example: 400
+          type: integer
+        errorCode:
+          example: INSUFFICIENT_POINTS
+          type: string
+        message:
+          example: Member does not have enough points for this reward
+          type: string
+        timestamp:
+          format: date-time
+          type: string
+        path:
+          example: /loyalty/v1/rewards
+          type: string
+      required:
+      - message
+      - status
+      type: object
+  securitySchemes:
+    ApiKeyAuth:
+      description: API Key required for all gateway requests.
+      in: header
+      name: X-API-Key
+      type: apiKey

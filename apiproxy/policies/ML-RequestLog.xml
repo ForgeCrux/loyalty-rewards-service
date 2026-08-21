@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  MessageLogging – Request Log → Google Cloud Logging
+  Logs rich request metadata asynchronously so it does NOT
+  add to the request latency.
+
+  Log Name  : apigee-proxy-log
+  Project   : {system.env.GOOGLE_CLOUD_PROJECT}
+  Variable  : message.log.level (DEBUG/INFO/WARN/ERROR)
+
+  Structured log fields (JSON payload):
+    requestId, method, path, clientIp, userAgent,
+    authType, clientId, appName, timestamp
+-->
+<MessageLogging async="true" continueOnError="true" enabled="true"
+                name="ML-RequestLog">
+  <DisplayName>Log Request to Cloud Logging</DisplayName>
+  <CloudLogging>
+    <LogName>apigee-proxy-log</LogName>
+    <Message contentType="application/json" defaultVariableValue="unknown">{
+  "requestId": "{messageid}",
+  "timestamp": "{system.timestamp}",
+  "method": "{request.verb}",
+  "path": "{proxy.basepath}{proxy.pathsuffix}",
+  "queryString": "{request.querystring}",
+  "clientIp": "{client.ip}",
+  "userAgent": "{request.header.user-agent}",
+  "contentType": "{request.header.content-type}",
+  "authType": "{request.header.x-auth-type}",
+  "clientId": "{request.header.x-authenticated-client-id}",
+  "appName": "{request.header.x-authenticated-app-name}",
+  "environment": "{environment.name}",
+  "proxyName": "{apiproxy.name}",
+  "proxyRevision": "{apiproxy.revision}",
+  "correlationId": "{request.header.x-correlation-id}"
+}</Message>
+    <ResourceType>apigee.googleapis.com/Environment</ResourceType>
+    <Labels>
+      <Label>
+        <Key>apigee_proxy</Key>
+        <Value ref="apiproxy.name"/>
+      </Label>
+      <Label>
+        <Key>environment</Key>
+        <Value ref="environment.name"/>
+      </Label>
+    </Labels>
+  </CloudLogging>
+</MessageLogging>

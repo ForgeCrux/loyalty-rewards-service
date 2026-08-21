@@ -1,0 +1,128 @@
+{
+  "microserviceId" : "6a881cc06dbbd93a1267bf07",
+  "mocks" : [ {
+    "id" : "9d8bfbc0-72db-452b-9185-19b3e5cb0ba2",
+    "microserviceId" : "6a881cc06dbbd93a1267bf07",
+    "specMetadataId" : "6a881cfca6ae4f6c2c0ed491",
+    "apiSpecName" : "Loyalty Rewards Service",
+    "name" : "mock-loyalty-rewards-service",
+    "mockServiceName" : "mock-loyalty-rewards-service",
+    "mockServerUrl" : "https://forgesphere.probestack.io/mock-api/v1/api/mocks/mock-e7fefa80",
+    "responseLatencyMs" : 0,
+    "mockUrl" : "mock-e7fefa80",
+    "isPrivate" : true,
+    "delayMs" : 0,
+    "requestCount" : 0,
+    "createdAt" : "2026-08-21T09:40:22.943Z",
+    "updatedAt" : "2026-08-21T09:40:22.972Z",
+    "endpoints" : [ {
+      "id" : "875afd49-d3d7-4f48-bc1e-fc13ea1105c9",
+      "mockId" : "9d8bfbc0-72db-452b-9185-19b3e5cb0ba2",
+      "path" : "/accounts/{memberId}",
+      "method" : "GET",
+      "responseStatus" : 200,
+      "responseHeaders" : {
+        "Content-Type" : "application/json"
+      },
+      "responseBody" : "{\"memberId\":\"00000000-0000-0000-0000-000000000000\",\"pointBalance\":12450,\"lifetimePoints\":48200,\"tier\":\"GOLD\",\"pointsToNextTier\":2550,\"autoRedeem\":false,\"emailUpdates\":true,\"enrolledAt\":\"2024-01-01T00:00:00Z\",\"updatedAt\":\"2024-01-01T00:00:00Z\"}",
+      "delayMs" : 0,
+      "isActive" : true,
+      "requestBodySample" : null,
+      "validationMode" : "NONE",
+      "validationSchema" : null,
+      "validateMethod" : true,
+      "createdAt" : "2026-08-21T09:40:23.076Z",
+      "updatedAt" : "2026-08-21T09:40:23.078Z"
+    }, {
+      "id" : "47a7e8f4-6d9a-4bb4-b4a8-54117efc801e",
+      "mockId" : "9d8bfbc0-72db-452b-9185-19b3e5cb0ba2",
+      "path" : "/accounts/{memberId}",
+      "method" : "PUT",
+      "responseStatus" : 200,
+      "responseHeaders" : {
+        "Content-Type" : "application/json"
+      },
+      "responseBody" : "{\"memberId\":\"00000000-0000-0000-0000-000000000000\",\"pointBalance\":12450,\"lifetimePoints\":48200,\"tier\":\"GOLD\",\"pointsToNextTier\":2550,\"autoRedeem\":false,\"emailUpdates\":true,\"enrolledAt\":\"2024-01-01T00:00:00Z\",\"updatedAt\":\"2024-01-01T00:00:00Z\"}",
+      "delayMs" : 0,
+      "isActive" : true,
+      "requestBodySample" : "{\"autoRedeem\":true,\"emailUpdates\":false}",
+      "validationMode" : "NONE",
+      "validationSchema" : null,
+      "validateMethod" : true,
+      "createdAt" : "2026-08-21T09:40:23.091Z",
+      "updatedAt" : "2026-08-21T09:40:23.091Z"
+    }, {
+      "id" : "73714563-a743-4dc3-af43-f6bf9decf257",
+      "mockId" : "9d8bfbc0-72db-452b-9185-19b3e5cb0ba2",
+      "path" : "/accounts/{memberId}/transactions",
+      "method" : "GET",
+      "responseStatus" : 200,
+      "responseHeaders" : {
+        "Content-Type" : "application/json"
+      },
+      "responseBody" : "[{\"id\":\"00000000-0000-0000-0000-000000000000\",\"memberId\":\"00000000-0000-0000-0000-000000000000\",\"type\":\"EARN\",\"points\":350,\"source\":\"ORDER:ORD-2026-0001\",\"balanceAfter\":12450,\"occurredAt\":\"2024-01-01T00:00:00Z\"}]",
+      "delayMs" : 0,
+      "isActive" : true,
+      "requestBodySample" : null,
+      "validationMode" : "NONE",
+      "validationSchema" : null,
+      "validateMethod" : true,
+      "createdAt" : "2026-08-21T09:40:23.102Z",
+      "updatedAt" : "2026-08-21T09:40:23.103Z"
+    }, {
+      "id" : "6801716a-5d5a-4079-989f-26e961cdfd77",
+      "mockId" : "9d8bfbc0-72db-452b-9185-19b3e5cb0ba2",
+      "path" : "/accounts/{memberId}/transactions",
+      "method" : "POST",
+      "responseStatus" : 201,
+      "responseHeaders" : {
+        "Content-Type" : "application/json"
+      },
+      "responseBody" : "{\"id\":\"00000000-0000-0000-0000-000000000000\",\"memberId\":\"00000000-0000-0000-0000-000000000000\",\"type\":\"EARN\",\"points\":350,\"source\":\"ORDER:ORD-2026-0001\",\"balanceAfter\":12450,\"occurredAt\":\"2024-01-01T00:00:00Z\"}",
+      "delayMs" : 0,
+      "isActive" : true,
+      "requestBodySample" : "{\"type\":\"EARN\",\"points\":350,\"source\":\"ORDER:ORD-2026-0001\",\"note\":\"Points for August order\"}",
+      "validationMode" : "NONE",
+      "validationSchema" : null,
+      "validateMethod" : true,
+      "createdAt" : "2026-08-21T09:40:23.116Z",
+      "updatedAt" : "2026-08-21T09:40:23.116Z"
+    }, {
+      "id" : "5ddeefac-c12f-4851-b913-8e918f18742c",
+      "mockId" : "9d8bfbc0-72db-452b-9185-19b3e5cb0ba2",
+      "path" : "/rewards",
+      "method" : "GET",
+      "responseStatus" : 200,
+      "responseHeaders" : {
+        "Content-Type" : "application/json"
+      },
+      "responseBody" : "[{\"id\":\"00000000-0000-0000-0000-000000000000\",\"name\":\"10 USD store credit\",\"description\":\"Applies as a discount on your next order\",\"pointCost\":1000,\"category\":\"CREDIT\",\"available\":true}]",
+      "delayMs" : 0,
+      "isActive" : true,
+      "requestBodySample" : null,
+      "validationMode" : "NONE",
+      "validationSchema" : null,
+      "validateMethod" : true,
+      "createdAt" : "2026-08-21T09:40:23.131Z",
+      "updatedAt" : "2026-08-21T09:40:23.131Z"
+    }, {
+      "id" : "2f600f81-b74b-4998-8d5f-352aa9b9798e",
+      "mockId" : "9d8bfbc0-72db-452b-9185-19b3e5cb0ba2",
+      "path" : "/rewards/{rewardId}/redeem",
+      "method" : "POST",
+      "responseStatus" : 201,
+      "responseHeaders" : {
+        "Content-Type" : "application/json"
+      },
+      "responseBody" : "{\"id\":\"00000000-0000-0000-0000-000000000000\",\"rewardId\":\"00000000-0000-0000-0000-000000000000\",\"memberId\":\"00000000-0000-0000-0000-000000000000\",\"pointsBurned\":1000,\"redemptionCode\":\"RWD-8H3K-92QP\",\"status\":\"ISSUED\",\"expiresAt\":\"2024-01-01T00:00:00Z\"}",
+      "delayMs" : 0,
+      "isActive" : true,
+      "requestBodySample" : "{\"memberId\":\"00000000-0000-0000-0000-000000000000\",\"deliveryEmail\":\"john.doe@example.com\"}",
+      "validationMode" : "NONE",
+      "validationSchema" : null,
+      "validateMethod" : true,
+      "createdAt" : "2026-08-21T09:40:23.143Z",
+      "updatedAt" : "2026-08-21T09:40:23.143Z"
+    } ]
+  } ]
+}

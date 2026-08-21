@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  MessageLogging – Response Log → Google Cloud Logging
+  Logs the response after it has been returned to the caller.
+  Runs asynchronously to avoid adding latency.
+-->
+<MessageLogging async="true" continueOnError="true" enabled="true"
+                name="ML-ResponseLog">
+  <DisplayName>Log Response to Cloud Logging</DisplayName>
+  <CloudLogging>
+    <LogName>apigee-proxy-log</LogName>
+    <Message contentType="application/json" defaultVariableValue="unknown">{
+  "requestId": "{messageid}",
+  "timestamp": "{system.timestamp}",
+  "statusCode": "{message.status.code}",
+  "responseTime": "{client.received.end.timestamp}",
+  "targetUrl": "{target.url}",
+  "targetStatusCode": "{target.received.start.timestamp}"
+}</Message>
+    <ResourceType>apigee.googleapis.com/Environment</ResourceType>
+  </CloudLogging>
+</MessageLogging>

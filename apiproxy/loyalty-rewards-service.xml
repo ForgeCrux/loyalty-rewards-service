@@ -17,7 +17,6 @@
   AM-AddCorrelationId
   EV-ExtractPathParams
   AM-RequestTransform
-  ML-RequestLog
 
 -->
 <APIProxy revision="1" name="loyalty-rewards-service">
@@ -42,7 +41,6 @@ rate limiting, and caching policies.
     <Policy>AM-AddCorrelationId</Policy>
     <Policy>EV-ExtractPathParams</Policy>
     <Policy>AM-RequestTransform</Policy>
-    <Policy>ML-RequestLog</Policy>
   </Policies>
   <ProxyEndpoints>
     <ProxyEndpoint>default</ProxyEndpoint>

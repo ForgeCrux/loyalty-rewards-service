@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  RaiseFault – Invalid or Missing API Key
+  Returns a consistent 401 JSON error when the API key is absent or invalid.
+-->
+<RaiseFault async="false" continueOnError="false" enabled="true"
+            name="RF-InvalidApiKey">
+  <DisplayName>Raise Invalid API Key Fault</DisplayName>
+  <FaultResponse>
+    <Set>
+      <StatusCode>401</StatusCode>
+      <ReasonPhrase>Unauthorized</ReasonPhrase>
+      <Headers>
+        <Header name="Content-Type">application/json</Header>
+        <Header name="WWW-Authenticate">APIKey realm="Apigee"</Header>
+      </Headers>
+      <Payload contentType="application/json">{
+    "error": {
+      "code": 401,
+      "type": "auth.InvalidApiKey",
+      "message": "API key missing or invalid. Provide a valid API key in the 'x-api-key' header.",
+      "requestId": "{messageid}"
+    }
+  }</Payload>
+    </Set>
+  </FaultResponse>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</RaiseFault>

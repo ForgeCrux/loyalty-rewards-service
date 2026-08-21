@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AssignMessage async="false" continueOnError="false" enabled="true"
+               name="AM-SetApiKeyContext">
+  <DisplayName>Set API Key Context Headers</DisplayName>
+  <AssignTo createNew="false" type="request"/>
+  <Set>
+    <Headers>
+      <Header name="X-Authenticated-Client-Id">{oauthv2.OA-VerifyApiKey.client_id}</Header>
+      <Header name="X-Authenticated-App-Name">{oauthv2.OA-VerifyApiKey.app.name}</Header>
+      <Header name="X-Auth-Type">apikey</Header>
+    </Headers>
+  </Set>
+  <Remove>
+    <Headers>
+      <!-- Remove the API key header from the backend request -->
+      <Header name="x-api-key"/>
+    </Headers>
+  </Remove>
+</AssignMessage>

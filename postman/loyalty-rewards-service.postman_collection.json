@@ -1,0 +1,203 @@
+{
+  "info" : {
+    "name" : "loyalty-rewards-service Postman Collection",
+    "description" : "Manages loyalty point balances, tier progression, and reward redemptions.\nThis API is used as the source specification to automatically generate\nan API Gateway proxy (Kong or Apigee) with routing, authentication,\nrate limiting, and caching policies.\n\n\nOpenAPI version: 1.0.0",
+    "schema" : "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth" : {
+    "type" : "apikey",
+    "apikey" : [ {
+      "key" : "key",
+      "value" : "x-api-key",
+      "type" : "string"
+    }, {
+      "key" : "value",
+      "value" : "{{apiKey}}",
+      "type" : "string"
+    }, {
+      "key" : "in",
+      "value" : "header",
+      "type" : "string"
+    } ]
+  },
+  "variable" : [ {
+    "key" : "baseUrl",
+    "value" : "https://gateway.probestack.io/loyalty/v1",
+    "type" : "string",
+    "description" : "Override with the base URL of the deployed Apigee proxy."
+  }, {
+    "key" : "apiKey",
+    "value" : "",
+    "type" : "string"
+  }, {
+    "key" : "memberId",
+    "value" : "",
+    "type" : "string",
+    "description" : "Unique loyalty member identifier"
+  }, {
+    "key" : "type",
+    "value" : "",
+    "type" : "string",
+    "description" : "Filter by transaction type"
+  }, {
+    "key" : "affordableForMemberId",
+    "value" : "",
+    "type" : "string",
+    "description" : "Return only rewards this member has enough points for"
+  }, {
+    "key" : "rewardId",
+    "value" : "",
+    "type" : "string"
+  } ],
+  "item" : [ {
+    "name" : "Get loyalty account",
+    "request" : {
+      "method" : "GET",
+      "description" : "Get loyalty account\n\nResponses:\n- 200: Loyalty account fetched successfully\n- 401: Missing or invalid API Key.\n- 404: Resource not found.\n- 500: Internal server error.",
+      "header" : [ ],
+      "url" : {
+        "raw" : "{{baseUrl}}/accounts/:memberId",
+        "host" : [ "{{baseUrl}}" ],
+        "path" : [ "accounts", ":memberId" ],
+        "variable" : [ {
+          "key" : "memberId",
+          "value" : "{{memberId}}",
+          "description" : "Unique loyalty member identifier"
+        } ]
+      }
+    },
+    "response" : [ ]
+  }, {
+    "name" : "Update account preferences",
+    "request" : {
+      "method" : "PUT",
+      "description" : "Update account preferences\n\nResponses:\n- 200: Account updated successfully\n- 400: Invalid request payload or parameters.\n- 401: Missing or invalid API Key.\n- 404: Resource not found.\n- 500: Internal server error.",
+      "header" : [ {
+        "key" : "Content-Type",
+        "value" : "application/json",
+        "type" : "text"
+      } ],
+      "body" : {
+        "mode" : "raw",
+        "raw" : "{}",
+        "options" : {
+          "raw" : {
+            "language" : "json"
+          }
+        }
+      },
+      "url" : {
+        "raw" : "{{baseUrl}}/accounts/:memberId",
+        "host" : [ "{{baseUrl}}" ],
+        "path" : [ "accounts", ":memberId" ],
+        "variable" : [ {
+          "key" : "memberId",
+          "value" : "{{memberId}}"
+        } ]
+      }
+    },
+    "response" : [ ]
+  }, {
+    "name" : "List point transactions",
+    "request" : {
+      "method" : "GET",
+      "description" : "List point transactions\n\nResponses:\n- 200: Transactions fetched successfully\n- 401: Missing or invalid API Key.\n- 404: Resource not found.\n- 500: Internal server error.",
+      "header" : [ ],
+      "url" : {
+        "raw" : "{{baseUrl}}/accounts/:memberId/transactions?type={{type}}",
+        "host" : [ "{{baseUrl}}" ],
+        "path" : [ "accounts", ":memberId", "transactions" ],
+        "query" : [ {
+          "key" : "type",
+          "value" : "{{type}}",
+          "disabled" : true,
+          "description" : "Filter by transaction type"
+        } ],
+        "variable" : [ {
+          "key" : "memberId",
+          "value" : "{{memberId}}"
+        } ]
+      }
+    },
+    "response" : [ ]
+  }, {
+    "name" : "Record a point transaction",
+    "request" : {
+      "method" : "POST",
+      "description" : "Record a point transaction\n\nResponses:\n- 201: Transaction recorded successfully\n- 400: Invalid request payload or parameters.\n- 401: Missing or invalid API Key.\n- 500: Internal server error.",
+      "header" : [ {
+        "key" : "Content-Type",
+        "value" : "application/json",
+        "type" : "text"
+      } ],
+      "body" : {
+        "mode" : "raw",
+        "raw" : "{}",
+        "options" : {
+          "raw" : {
+            "language" : "json"
+          }
+        }
+      },
+      "url" : {
+        "raw" : "{{baseUrl}}/accounts/:memberId/transactions",
+        "host" : [ "{{baseUrl}}" ],
+        "path" : [ "accounts", ":memberId", "transactions" ],
+        "variable" : [ {
+          "key" : "memberId",
+          "value" : "{{memberId}}"
+        } ]
+      }
+    },
+    "response" : [ ]
+  }, {
+    "name" : "List available rewards",
+    "request" : {
+      "method" : "GET",
+      "description" : "List available rewards\n\nResponses:\n- 200: Rewards fetched successfully\n- 401: Missing or invalid API Key.\n- 500: Internal server error.",
+      "header" : [ ],
+      "url" : {
+        "raw" : "{{baseUrl}}/rewards?affordableForMemberId={{affordableForMemberId}}",
+        "host" : [ "{{baseUrl}}" ],
+        "path" : [ "rewards" ],
+        "query" : [ {
+          "key" : "affordableForMemberId",
+          "value" : "{{affordableForMemberId}}",
+          "disabled" : true,
+          "description" : "Return only rewards this member has enough points for"
+        } ]
+      }
+    },
+    "response" : [ ]
+  }, {
+    "name" : "Redeem a reward",
+    "request" : {
+      "method" : "POST",
+      "description" : "Redeem a reward\n\nResponses:\n- 201: Reward redeemed successfully\n- 400: Invalid request payload or parameters.\n- 401: Missing or invalid API Key.\n- 404: Resource not found.\n- 500: Internal server error.",
+      "header" : [ {
+        "key" : "Content-Type",
+        "value" : "application/json",
+        "type" : "text"
+      } ],
+      "body" : {
+        "mode" : "raw",
+        "raw" : "{}",
+        "options" : {
+          "raw" : {
+            "language" : "json"
+          }
+        }
+      },
+      "url" : {
+        "raw" : "{{baseUrl}}/rewards/:rewardId/redeem",
+        "host" : [ "{{baseUrl}}" ],
+        "path" : [ "rewards", ":rewardId", "redeem" ],
+        "variable" : [ {
+          "key" : "rewardId",
+          "value" : "{{rewardId}}"
+        } ]
+      }
+    },
+    "response" : [ ]
+  } ]
+}

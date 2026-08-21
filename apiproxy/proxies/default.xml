@@ -81,9 +81,6 @@
       <Step>
         <Name>AM-RequestTransform</Name>
       </Step>
-      <Step>
-        <Name>ML-RequestLog</Name>
-      </Step>
 
     </Request>
     <Response>
@@ -93,9 +90,6 @@
       </Step>
       <Step>
         <Name>AM-ResponseTransform</Name>
-      </Step>
-      <Step>
-        <Name>ML-ResponseLog</Name>
       </Step>
 
     </Response>
